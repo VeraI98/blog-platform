@@ -32,14 +32,12 @@ export default function ArticleListPage() {
 
   return (
     <>
-      {/* Banner */}
       <div className="banner">
         <h1>Realworld Blog</h1>
         <p>A place to share your knowledge.</p>
       </div>
 
       <div className="page-content">
-        {/* Main feed */}
         <div className="feed-col">
           <div className="feed-toggle">
             <button
@@ -48,11 +46,7 @@ export default function ArticleListPage() {
             >
               Global Feed
             </button>
-            {selectedTag && (
-              <button className="feed-tab active">
-                # {selectedTag}
-              </button>
-            )}
+            {selectedTag && <button className="feed-tab active"># {selectedTag}</button>}
           </div>
 
           {loading && <Loading />}
@@ -79,7 +73,6 @@ export default function ArticleListPage() {
           )}
         </div>
 
-        {/* Sidebar */}
         <TagsSidebar selectedTag={selectedTag} onSelectTag={handleSelectTag} />
       </div>
     </>
