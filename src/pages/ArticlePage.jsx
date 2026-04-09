@@ -49,6 +49,7 @@ export default function ArticlePage() {
 
   return (
     <>
+      {/* Banner with title and meta */}
       <div className="article-page-banner">
         <h1>{title}</h1>
         <div className="article-meta">
@@ -78,6 +79,7 @@ export default function ArticlePage() {
         </div>
       </div>
 
+      {/* Article body */}
       <div className="article-body-wrap">
         <Link to="/" className="back-link">
           ← Back to articles

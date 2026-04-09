@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 
 const AuthContext = createContext(null)
-
 const STORAGE_KEY = 'rw_user'
 
 function loadUser() {
@@ -40,6 +39,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
+  if (!ctx) throw new Error('useAuth must be inside AuthProvider')
   return ctx
 }

@@ -8,25 +8,29 @@ export default function SignInPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [serverErrors, setServerErrors] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({ mode: 'onTouched' })
 
   async function onSubmit(values) {
     setServerErrors(null)
-    setLoading(true)
+    setSubmitting(true)
     try {
       const user = await loginUser(values)
       login(user)
       navigate('/')
     } catch (errs) {
-      setServerErrors(errs)
+      if (errs && typeof errs === 'object') {
+        setServerErrors(errs)
+      } else {
+        setServerErrors({ general: ['Something went wrong. Please try again.'] })
+      }
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -38,13 +42,13 @@ export default function SignInPage() {
           <Link to="/sign-up">Need an account?</Link>
         </p>
 
-        {/* Server errors */}
         {serverErrors && (
-          <ul className="form-errors-list">
+          <ul className="server-errors">
             {Object.entries(serverErrors).map(([field, msgs]) =>
               [].concat(msgs).map((msg, i) => (
                 <li key={`${field}-${i}`}>
-                  {field} {msg}
+                  {field !== 'general' ? `${field} ` : ''}
+                  {msg}
                 </li>
               ))
             )}
@@ -57,9 +61,13 @@ export default function SignInPage() {
               className={`form-input${errors.email ? ' input-error' : ''}`}
               type="email"
               placeholder="Email address"
+              autoComplete="email"
               {...register('email', {
                 required: 'Email is required',
-                pattern: { value: /\S+@\S+\.\S+/, message: 'Email must be valid' },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Email must be valid',
+                },
               })}
             />
             {errors.email && <p className="field-error">{errors.email.message}</p>}
@@ -70,13 +78,16 @@ export default function SignInPage() {
               className={`form-input${errors.password ? ' input-error' : ''}`}
               type="password"
               placeholder="Password"
-              {...register('password', { required: 'Password is required' })}
+              autoComplete="current-password"
+              {...register('password', {
+                required: 'Password is required',
+              })}
             />
             {errors.password && <p className="field-error">{errors.password.message}</p>}
           </div>
 
-          <button className="btn-submit" type="submit" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
+          <button className="btn-submit" type="submit" disabled={submitting}>
+            {submitting ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
       </div>

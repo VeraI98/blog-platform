@@ -8,32 +8,35 @@ export default function SettingsPage() {
   const { user, updateUser, logout } = useAuth()
   const navigate = useNavigate()
   const [serverErrors, setServerErrors] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
-  } = useForm()
+  } = useForm({ mode: 'onTouched' })
 
   useEffect(() => {
-    if (user) {
-      reset({
-        image: user.image || '',
-        username: user.username || '',
-        bio: user.bio || '',
-        email: user.email || '',
-        password: '',
-      })
+    if (!user) {
+      navigate('/sign-in')
+      return
     }
-  }, [user, reset])
+    reset({
+      image: user.image || '',
+      username: user.username || '',
+      bio: user.bio || '',
+      email: user.email || '',
+      password: '',
+    })
+  }, [user, reset, navigate])
 
   async function onSubmit(values) {
     setServerErrors(null)
     setSuccess(false)
-    setLoading(true)
+    setSubmitting(true)
 
     const fields = { ...values }
     if (!fields.password) delete fields.password
@@ -43,9 +46,22 @@ export default function SettingsPage() {
       updateUser({ ...updated, token: user.token })
       setSuccess(true)
     } catch (errs) {
-      setServerErrors(errs)
+      if (errs && typeof errs === 'object') {
+        setServerErrors(errs)
+        // Highlight individual fields that have server errors
+        Object.entries(errs).forEach(([field, msgs]) => {
+          if (['username', 'email', 'password', 'image', 'bio'].includes(field)) {
+            setError(field, {
+              type: 'server',
+              message: [].concat(msgs)[0],
+            })
+          }
+        })
+      } else {
+        setServerErrors({ general: ['Something went wrong. Please try again.'] })
+      }
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -54,10 +70,7 @@ export default function SettingsPage() {
     navigate('/')
   }
 
-  if (!user) {
-    navigate('/sign-in')
-    return null
-  }
+  if (!user) return null
 
   return (
     <div className="auth-page">
@@ -65,11 +78,12 @@ export default function SettingsPage() {
         <h1 className="auth-title">Your Settings</h1>
 
         {serverErrors && (
-          <ul className="form-errors-list">
+          <ul className="server-errors">
             {Object.entries(serverErrors).map(([field, msgs]) =>
               [].concat(msgs).map((msg, i) => (
                 <li key={`${field}-${i}`}>
-                  {field} {msg}
+                  {field !== 'general' ? `${field} ` : ''}
+                  {msg}
                 </li>
               ))
             )}
@@ -79,22 +93,23 @@ export default function SettingsPage() {
         {success && <div className="form-success">Profile updated successfully!</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/*ПОЛЕ аватара*/}
+          {/* Avatar URL */}
           <div className="form-group">
             <input
               className={`form-input${errors.image ? ' input-error' : ''}`}
-              type="url"
+              type="text"
               placeholder="URL of profile picture"
               {...register('image', {
                 pattern: {
-                  value: /^https?:\/\/.+/,
-                  message: 'Avatar image must be a valid URL',
+                  value: /^(https?:\/\/).+/,
+                  message: 'Avatar image must be a valid URL (http:// or https://)',
                 },
               })}
             />
             {errors.image && <p className="field-error">{errors.image.message}</p>}
           </div>
 
+          {/* Username */}
           <div className="form-group">
             <input
               className={`form-input${errors.username ? ' input-error' : ''}`}
@@ -107,6 +122,7 @@ export default function SettingsPage() {
             {errors.username && <p className="field-error">{errors.username.message}</p>}
           </div>
 
+          {/* Bio */}
           <div className="form-group">
             <textarea
               className="form-input form-textarea"
@@ -116,6 +132,7 @@ export default function SettingsPage() {
             />
           </div>
 
+          {/* Email */}
           <div className="form-group">
             <input
               className={`form-input${errors.email ? ' input-error' : ''}`}
@@ -123,17 +140,22 @@ export default function SettingsPage() {
               placeholder="Email address"
               {...register('email', {
                 required: 'Email must not be empty',
-                pattern: { value: /\S+@\S+\.\S+/, message: 'Email must be valid' },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Email must be valid',
+                },
               })}
             />
             {errors.email && <p className="field-error">{errors.email.message}</p>}
           </div>
 
+          {/* New password (optional) */}
           <div className="form-group">
             <input
               className={`form-input${errors.password ? ' input-error' : ''}`}
               type="password"
               placeholder="New password (leave blank to keep current)"
+              autoComplete="new-password"
               {...register('password', {
                 minLength: {
                   value: 6,
@@ -148,8 +170,8 @@ export default function SettingsPage() {
             {errors.password && <p className="field-error">{errors.password.message}</p>}
           </div>
 
-          <button className="btn-submit" type="submit" disabled={loading}>
-            {loading ? 'Saving...' : 'Update Settings'}
+          <button className="btn-submit" type="submit" disabled={submitting}>
+            {submitting ? 'Saving...' : 'Update Settings'}
           </button>
         </form>
 

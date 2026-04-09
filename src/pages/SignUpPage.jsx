@@ -8,28 +8,32 @@ export default function SignUpPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [serverErrors, setServerErrors] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm()
+  } = useForm({ mode: 'onTouched' })
 
-  const password = watch('password')
+  const passwordValue = watch('password', '')
 
   async function onSubmit({ username, email, password }) {
     setServerErrors(null)
-    setLoading(true)
+    setSubmitting(true)
     try {
       const user = await registerUser({ username, email, password })
       login(user)
       navigate('/')
     } catch (errs) {
-      setServerErrors(errs)
+      if (errs && typeof errs === 'object') {
+        setServerErrors(errs)
+      } else {
+        setServerErrors({ general: ['Something went wrong. Please try again.'] })
+      }
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -42,11 +46,12 @@ export default function SignUpPage() {
         </p>
 
         {serverErrors && (
-          <ul className="form-errors-list">
+          <ul className="server-errors">
             {Object.entries(serverErrors).map(([field, msgs]) =>
               [].concat(msgs).map((msg, i) => (
                 <li key={`${field}-${i}`}>
-                  {field} {msg}
+                  {field !== 'general' ? `${field} ` : ''}
+                  {msg}
                 </li>
               ))
             )}
@@ -60,10 +65,17 @@ export default function SignUpPage() {
               className={`form-input${errors.username ? ' input-error' : ''}`}
               type="text"
               placeholder="Username"
+              autoComplete="username"
               {...register('username', {
                 required: 'Username is required',
-                minLength: { value: 3, message: 'Username must be at least 3 characters' },
-                maxLength: { value: 20, message: 'Username must be at most 20 characters' },
+                minLength: {
+                  value: 3,
+                  message: 'Username must be at least 3 characters',
+                },
+                maxLength: {
+                  value: 20,
+                  message: 'Username must be at most 20 characters',
+                },
               })}
             />
             {errors.username && <p className="field-error">{errors.username.message}</p>}
@@ -75,9 +87,13 @@ export default function SignUpPage() {
               className={`form-input${errors.email ? ' input-error' : ''}`}
               type="email"
               placeholder="Email address"
+              autoComplete="email"
               {...register('email', {
                 required: 'Email is required',
-                pattern: { value: /\S+@\S+\.\S+/, message: 'Email must be valid' },
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Email must be valid',
+                },
               })}
             />
             {errors.email && <p className="field-error">{errors.email.message}</p>}
@@ -89,24 +105,32 @@ export default function SignUpPage() {
               className={`form-input${errors.password ? ' input-error' : ''}`}
               type="password"
               placeholder="Password"
+              autoComplete="new-password"
               {...register('password', {
                 required: 'Password is required',
-                minLength: { value: 6, message: 'Password must be at least 6 characters' },
-                maxLength: { value: 40, message: 'Password must be at most 40 characters' },
+                minLength: {
+                  value: 6,
+                  message: 'Password must be at least 6 characters',
+                },
+                maxLength: {
+                  value: 40,
+                  message: 'Password must be at most 40 characters',
+                },
               })}
             />
             {errors.password && <p className="field-error">{errors.password.message}</p>}
           </div>
 
-          {/* Repeat password */}
+          {/* Confirm password */}
           <div className="form-group">
             <input
               className={`form-input${errors.confirmPassword ? ' input-error' : ''}`}
               type="password"
               placeholder="Repeat Password"
+              autoComplete="new-password"
               {...register('confirmPassword', {
                 required: 'Please confirm your password',
-                validate: (v) => v === password || 'Passwords do not match',
+                validate: (val) => val === passwordValue || 'Passwords do not match',
               })}
             />
             {errors.confirmPassword && (
@@ -114,7 +138,7 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {/* Agreement checkbox */}
+          {/* Agreement */}
           <div className="form-group form-group-check">
             <label className={`checkbox-label${errors.agree ? ' check-error' : ''}`}>
               <input
@@ -128,8 +152,8 @@ export default function SignUpPage() {
             {errors.agree && <p className="field-error">{errors.agree.message}</p>}
           </div>
 
-          <button className="btn-submit" type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create'}
+          <button className="btn-submit" type="submit" disabled={submitting}>
+            {submitting ? 'Creating account...' : 'Create'}
           </button>
         </form>
       </div>
