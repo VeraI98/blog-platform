@@ -1,5 +1,8 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import editIcon from '../assets/icons/edit.png'
+import settingsIcon from '../assets/icons/setttings.png'
+import userIcon from '../assets/icons/user.png'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -28,41 +31,29 @@ export default function Navbar() {
             <>
               <li className="nav-item">
                 <NavLink to="/new-post" className={({ isActive }) => (isActive ? 'active' : '')}>
-                  {/* ✏️ ИКОНКА: src/assets/icons/edit.svg — карандаш */}
-                  {/* Замените span ниже на: <img src={editIcon} alt="" /> */}
-                  <span className="nav-icon">✏</span>
+                  <img src={editIcon} alt="" className="nav-icon-img" />
                   New Post
                 </NavLink>
               </li>
               <li className="nav-item">
                 <NavLink to="/settings" className={({ isActive }) => (isActive ? 'active' : '')}>
-                  {/* ⚙️ ИКОНКА: src/assets/icons/settings.svg — шестерёнка */}
-                  {/* Замените span ниже на: <img src={settingsIcon} alt="" /> */}
-                  <span className="nav-icon">⚙</span>
+                  <img src={settingsIcon} alt="" className="nav-icon-img" />
                   Settings
                 </NavLink>
               </li>
               <li className="nav-item">
+                {/* encodeURIComponent корректно обрабатывает пробелы в username */}
                 <NavLink
-                  to={`/profile/${user.username}`}
+                  to={`/profile/${encodeURIComponent(user.username)}`}
                   className={({ isActive }) => (isActive ? 'active' : '')}
                 >
-                  {/*
-                   * 👤 АВАТАР ПОЛЬЗОВАТЕЛЯ:
-                   * Здесь отображается аватар из профиля.
-                   * Если у пользователя нет фото — показывается иконка-заглушка.
-                   * ИКОНКА-ЗАГЛУШКА: src/assets/icons/user.svg — силуэт человека
-                   * Замените img-заглушку ниже на: <img src={userIcon} alt="" />
-                   */}
                   <img
-                    src={
-                      user.image ||
-                      `https://api.dicebear.com/7.x/initials/svg?seed=${user.username}&backgroundColor=5cb85c&fontColor=ffffff`
-                    }
+                    src={user.image || userIcon}
                     alt={user.username}
                     className="nav-avatar"
                     onError={(e) => {
-                      e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.username}`
+                      e.target.onerror = null
+                      e.target.src = userIcon
                     }}
                   />
                   {user.username}

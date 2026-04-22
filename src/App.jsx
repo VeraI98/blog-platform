@@ -6,6 +6,7 @@ import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
+import NewPostPage from './pages/NewPostPage'
 
 function NotFound() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile/:username" element={<ProfilePage />} />
+        <Route path="/new-post" element={<NewPostPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <footer className="site-footer">

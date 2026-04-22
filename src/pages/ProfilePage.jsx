@@ -7,8 +7,7 @@ import ArticlePreview from '../components/ArticlePreview'
 import Pagination from '../components/Pagination'
 import Loading from '../components/Loading'
 import ErrorMessage from '../components/ErrorMessage'
-
-import settingsIcon from '../assets/icons/settings.svg'
+import userLargeIcon from '../assets/icons/user.png'
 
 const LIMIT = 5
 
@@ -17,22 +16,29 @@ export default function ProfilePage() {
   const { user } = useAuth()
   const [page, setPage] = useState(1)
 
+  // %20 пробел
+  const decodedUsername = decodeURIComponent(username)
+  const token = user?.token || null
+
   const {
     data: profile,
     loading: profileLoading,
     error: profileError,
-  } = useFetch(() => fetchProfile(username, user?.token), [username])
+  } = useFetch(() => fetchProfile(decodedUsername, token), [decodedUsername])
 
   const {
     data: articlesData,
     loading: articlesLoading,
     error: articlesError,
     refetch,
-  } = useFetch(() => fetchUserArticles({ username, page, limit: LIMIT }), [username, page])
+  } = useFetch(
+    () => fetchUserArticles({ username: decodedUsername, page, limit: LIMIT }),
+    [decodedUsername, page]
+  )
 
   const totalPages = articlesData ? Math.ceil(articlesData.articlesCount / LIMIT) : 0
 
-  const isOwn = user?.username === username
+  const isOwn = user?.username === decodedUsername
 
   if (profileLoading) return <Loading text="Loading profile..." />
 
@@ -49,19 +55,18 @@ export default function ProfilePage() {
       <div className="profile-banner">
         <img
           className="profile-avatar"
-          src={profile?.image || '/assets/icons/user-large.svg'} // fallback
-          alt={username}
+          src={profile?.image || userLargeIcon}
+          alt={decodedUsername}
           onError={(e) => {
-            e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${username}`
+            e.target.onerror = null
+            e.target.src = userLargeIcon
           }}
         />
-
-        <h2 className="profile-username">{username}</h2>
+        <h2 className="profile-username">{decodedUsername}</h2>
         {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
-
         {isOwn && (
           <Link to="/settings" className="btn-edit-profile">
-            <img src={settingsIcon} alt="settings" />
+            ⚙ Edit Profile Settings
           </Link>
         )}
       </div>
@@ -86,7 +91,6 @@ export default function ProfilePage() {
                   <ArticlePreview key={article.slug} article={article} />
                 ))
               )}
-
               <Pagination
                 currentPage={page}
                 totalPages={totalPages}

@@ -39,6 +39,9 @@ export default function ArticleListPage() {
       </div>
 
       <div className="page-content">
+        {/* Tags сверху */}
+        <TagsSidebar selectedTag={selectedTag} onSelectTag={handleSelectTag} />
+
         {/* Main feed */}
         <div className="feed-col">
           <div className="feed-toggle">
@@ -74,9 +77,6 @@ export default function ArticleListPage() {
             </>
           )}
         </div>
-
-        {/* Sidebar */}
-        <TagsSidebar selectedTag={selectedTag} onSelectTag={handleSelectTag} />
       </div>
     </>
   )
