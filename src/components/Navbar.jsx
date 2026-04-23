@@ -42,7 +42,7 @@ export default function Navbar() {
                 </NavLink>
               </li>
               <li className="nav-item">
-                {/* encodeURIComponent корректно обрабатывает пробелы в username */}
+                {/* encodeURIComponent обрабатывает пробелы*/}
                 <NavLink
                   to={`/profile/${encodeURIComponent(user.username)}`}
                   className={({ isActive }) => (isActive ? 'active' : '')}

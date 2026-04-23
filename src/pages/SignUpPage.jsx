@@ -59,7 +59,7 @@ export default function SignUpPage() {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* Username */}
+          {/* имя */}
           <div className="form-group">
             <input
               className={`form-input${errors.username ? ' input-error' : ''}`}
@@ -81,7 +81,7 @@ export default function SignUpPage() {
             {errors.username && <p className="field-error">{errors.username.message}</p>}
           </div>
 
-          {/* Email */}
+          {/* еmail */}
           <div className="form-group">
             <input
               className={`form-input${errors.email ? ' input-error' : ''}`}
@@ -99,7 +99,7 @@ export default function SignUpPage() {
             {errors.email && <p className="field-error">{errors.email.message}</p>}
           </div>
 
-          {/* Password */}
+          {/* пароль */}
           <div className="form-group">
             <input
               className={`form-input${errors.password ? ' input-error' : ''}`}
@@ -121,7 +121,6 @@ export default function SignUpPage() {
             {errors.password && <p className="field-error">{errors.password.message}</p>}
           </div>
 
-          {/* Confirm password */}
           <div className="form-group">
             <input
               className={`form-input${errors.confirmPassword ? ' input-error' : ''}`}
@@ -138,7 +137,6 @@ export default function SignUpPage() {
             )}
           </div>
 
-          {/* Agreement */}
           <div className="form-group form-group-check">
             <label className={`checkbox-label${errors.agree ? ' check-error' : ''}`}>
               <input

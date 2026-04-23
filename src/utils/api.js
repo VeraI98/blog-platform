@@ -79,3 +79,53 @@ export async function fetchProfile(username, token) {
   const data = await res.json()
   return data.profile
 }
+
+export async function createArticle(token, { title, description, body, tagList }) {
+  const res = await fetch(`${BASE_URL}/articles`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ article: { title, description, body, tagList } }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw data.errors
+  return data.article
+}
+
+export async function updateArticle(token, slug, fields) {
+  const res = await fetch(`${BASE_URL}/articles/${slug}`, {
+    method: 'PUT',
+    headers: authHeaders(token),
+    body: JSON.stringify({ article: fields }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw data.errors
+  return data.article
+}
+
+export async function deleteArticle(token, slug) {
+  const res = await fetch(`${BASE_URL}/articles/${slug}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+}
+
+export async function favoriteArticle(token, slug) {
+  const res = await fetch(`${BASE_URL}/articles/${slug}/favorite`, {
+    method: 'POST',
+    headers: authHeaders(token),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return data.article
+}
+
+export async function unfavoriteArticle(token, slug) {
+  const res = await fetch(`${BASE_URL}/articles/${slug}/favorite`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  return data.article
+}

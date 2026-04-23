@@ -1,12 +1,14 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import PrivateRoute from './components/PrivateRoute'
 import ArticleListPage from './pages/ArticleListPage'
 import ArticlePage from './pages/ArticlePage'
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 import SettingsPage from './pages/SettingsPage'
 import ProfilePage from './pages/ProfilePage'
-import NewPostPage from './pages/NewPostPage'
+import NewArticlePage from './pages/NewArticlePage'
+import EditArticlePage from './pages/EditArticlePage'
 
 function NotFound() {
   return (
@@ -27,9 +29,39 @@ export default function App() {
         <Route path="/articles/:slug" element={<ArticlePage />} />
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route
+          path="/settings"
+          element={
+            <PrivateRoute>
+              <SettingsPage />
+            </PrivateRoute>
+          }
+        />
         <Route path="/profile/:username" element={<ProfilePage />} />
-        <Route path="/new-post" element={<NewPostPage />} />
+        <Route
+          path="/new-post"
+          element={
+            <PrivateRoute>
+              <NewArticlePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/new-article"
+          element={
+            <PrivateRoute>
+              <NewArticlePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/articles/:slug/edit"
+          element={
+            <PrivateRoute>
+              <EditArticlePage />
+            </PrivateRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <footer className="site-footer">

@@ -1,4 +1,7 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { favoriteArticle, unfavoriteArticle } from '../utils/api'
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-GB', {
@@ -8,7 +11,6 @@ function formatDate(dateStr) {
   })
 }
 
-// Heart SVG icon
 function HeartIcon() {
   return (
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -18,7 +20,44 @@ function HeartIcon() {
 }
 
 export default function ArticlePreview({ article }) {
-  const { slug, title, description, author, createdAt, favoritesCount, tagList } = article
+  const { slug, title, description, author, createdAt, tagList } = article
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  const [favorited, setFavorited] = useState(article.favorited)
+  const [favCount, setFavCount] = useState(article.favoritesCount)
+  const [loading, setLoading] = useState(false)
+
+  async function handleFavorite(e) {
+    e.preventDefault() // не переходить по ссылке
+
+    if (!user) {
+      navigate('/sign-in')
+      return
+    }
+
+    if (loading) return
+    setLoading(true)
+
+    // обновление
+    const newFavorited = !favorited
+    setFavorited(newFavorited)
+    setFavCount((c) => c + (newFavorited ? 1 : -1))
+
+    try {
+      const updated = newFavorited
+        ? await favoriteArticle(user.token, slug)
+        : await unfavoriteArticle(user.token, slug)
+      setFavorited(updated.favorited)
+      setFavCount(updated.favoritesCount)
+    } catch {
+      // откат при ошибке
+      setFavorited(!newFavorited)
+      setFavCount((c) => c + (newFavorited ? -1 : 1))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="article-preview">
@@ -32,20 +71,27 @@ export default function ArticlePreview({ article }) {
             }
             alt={author.username}
             onError={(e) => {
+              e.target.onerror = null
               e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=5cb85c&fontColor=ffffff`
             }}
           />
           <div className="author-details">
-            <Link to={`/profile/${author.username}`} className="author-name">
+            <Link to={`/profile/${encodeURIComponent(author.username)}`} className="author-name">
               {author.username}
             </Link>
             <span className="article-date">{formatDate(createdAt)}</span>
           </div>
         </div>
 
-        <button className="btn-like" disabled title="Sign in to like articles">
+        {/* Кнопка лайка */}
+        <button
+          className={`btn-like${favorited ? ' btn-like--active' : ''}`}
+          onClick={handleFavorite}
+          disabled={loading}
+          title={!user ? 'Sign in to like articles' : favorited ? 'Unlike' : 'Like'}
+        >
           <HeartIcon />
-          {favoritesCount}
+          {favCount}
         </button>
       </div>
 

@@ -1,4 +1,3 @@
-/* ── Reset ──────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -33,7 +32,7 @@ a {
   text-decoration: none;
 }
 
-/* ── Navbar ─────────────────────────────────────────── */
+/*  Navbar  */
 .navbar {
   background: var(--white);
   border-bottom: 1px solid var(--border);
@@ -84,7 +83,7 @@ a {
   color: var(--text);
 }
 
-/* ── Banner ─────────────────────────────────────────── */
+/*  Banner  */
 .banner {
   background: var(--green);
   color: var(--white);
@@ -108,7 +107,6 @@ a {
   opacity: 0.9;
 }
 
-/* ── Page layout — одна колонка по центру ───────────── */
 .page-content {
   max-width: 700px;
   margin: 0 auto;
@@ -118,7 +116,7 @@ a {
   gap: 0;
 }
 
-/* ── Sidebar (Popular tags) ─────────────────────────── */
+/*  Popular tags */
 .sidebar-col {
   width: 100%;
   margin-bottom: 16px;
@@ -163,7 +161,7 @@ a {
   border-color: var(--green);
 }
 
-/* ── Feed column ─────────────────────────────────────── */
+/*  Feed column */
 .feed-col {
   width: 100%;
 }
@@ -197,7 +195,7 @@ a {
   color: var(--text);
 }
 
-/* ── Article preview card ───────────────────────────── */
+/* Article preview card */
 .article-preview {
   background: var(--white);
   border: 1px solid var(--border);
@@ -328,7 +326,7 @@ a {
   font-weight: 300;
 }
 
-/* ── Pagination ─────────────────────────────────────── */
+/*  Pagination  */
 .pagination {
   display: flex;
   justify-content: center;
@@ -369,7 +367,7 @@ a {
   cursor: not-allowed;
 }
 
-/* ── Loading / Error ────────────────────────────────── */
+/*  Loading / Error */
 .loading-state {
   padding: 40px;
   text-align: center;
@@ -412,7 +410,7 @@ a {
   font-family: var(--font);
 }
 
-/* ── Article page ───────────────────────────────────── */
+/*  Article page  */
 .article-page-banner {
   background: var(--green);
   color: var(--white);
@@ -532,7 +530,7 @@ a {
   color: var(--text);
 }
 
-/* ── Footer ─────────────────────────────────────────── */
+/* Footer */
 .site-footer {
   border-top: 1px solid var(--border);
   padding: 20px 15px;
@@ -545,7 +543,7 @@ a {
   color: var(--green);
 }
 
-/* ── Auth pages ─────────────────────────────────────── */
+/* Auth pages */
 .auth-page {
   min-height: calc(100vh - 56px - 52px);
   display: flex;
@@ -723,7 +721,7 @@ a {
   text-decoration: underline;
 }
 
-/* ── Navbar user elements ────────────────────────────── */
+/*  Navbar user */
 .nav-icon {
   font-size: 13px;
   opacity: 0.7;
@@ -753,7 +751,7 @@ a {
   color: #dc3545;
 }
 
-/* ── Profile page ───────────────────────────────────── */
+/*Profile page */
 .profile-banner {
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -804,7 +802,375 @@ a {
   color: var(--text);
 }
 
-/* ── Responsive ─────────────────────────────────────── */
+/*article*/
+
+.ap-wrapper {
+  background: #fff;
+}
+/* отступ */
+.ap-spacer {
+  height: 90px;
+  background: #fff;
+}
+
+.ap-banner {
+  background: #333;
+  padding: 48px 16px;
+}
+
+.ap-banner-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  width: 100%;
+  padding-left: 140px; /* ← вот это даёт нужный сдвиг */
+}
+
+.ap-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #fff;
+  max-width: 800px;
+  margin-bottom: 24px;
+}
+
+.ap-banner-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ap-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ap-author-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  line-height: 1.3;
+}
+.ap-author-name:hover {
+  color: #7dd87d;
+  text-decoration: underline;
+}
+
+.ap-date {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+.ap-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 200px;
+}
+
+/* Текст статьи */
+.ap-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 32px;
+}
+.ap-body h1,
+.ap-body h2,
+.ap-body h3,
+.ap-body h4 {
+  margin: 1.5em 0 0.5em;
+  font-weight: 700;
+}
+.ap-body p {
+  margin-bottom: 1em;
+}
+.ap-body ul,
+.ap-body ol {
+  margin: 0 0 1em 1.5em;
+}
+.ap-body blockquote {
+  border-left: 4px solid var(--border);
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.ap-body code {
+  background: #f5f5f5;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+.ap-body pre {
+  background: #2b2b2b;
+  color: #f8f8f2;
+  padding: 1em;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+.ap-body pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+.ap-body a {
+  color: var(--green);
+  text-decoration: underline;
+}
+.ap-body img {
+  max-width: 100%;
+  margin: 1em 0;
+}
+
+/* Теги */
+.ap-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 40px;
+}
+
+/* Футер*/
+.ap-footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.ap-footer-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ap-footer-author-info {
+  display: flex;
+  flex-direction: column; /* имя сверху, дата снизу */
+}
+
+.ap-footer-author-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  line-height: 1.3;
+}
+.ap-footer-author-name:hover {
+  text-decoration: underline;
+  color: var(--green-dark);
+}
+
+.ap-footer-date {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.ap-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Edit */
+.ap-btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 16px;
+  border: 1px solid var(--green);
+  border-radius: 4px;
+  background: none;
+  color: var(--green);
+  font-size: 13px;
+  font-family: var(--font);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.ap-btn-edit:hover {
+  background: var(--green);
+  color: #fff;
+}
+
+/* Delete  */
+.ap-btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 16px;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  background: none;
+  color: #dc3545;
+  font-size: 13px;
+  font-family: var(--font);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.ap-btn-delete:hover {
+  background: #dc3545;
+  color: #fff;
+}
+.ap-btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Article form */
+.form-textarea-tall {
+  min-height: 200px;
+}
+.tags-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.btn-submit-right {
+  width: auto;
+  padding: 10px 24px;
+}
+
+/* Delete modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 15px;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 6px;
+  padding: 28px 32px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.modal-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-modal-cancel {
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.btn-modal-cancel:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+.btn-modal-confirm {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  background: #dc3545;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-modal-confirm:hover {
+  background: #c82333;
+}
+
+/* Favorite */
+.ap-btn-favorite {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  background: var(--green);
+  color: #fff;
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ap-btn-favorite:hover:not(:disabled) {
+  background: var(--green-dark);
+}
+.ap-btn-favorite:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* лайки */
+.ap-btn-favorite--active {
+  background: var(--green-dark) !important;
+}
+
+/* Лайк в ленте */
+.btn-like--active {
+  background: var(--green) !important;
+  color: #fff !important;
+  border-color: var(--green) !important;
+  cursor: pointer;
+}
+.btn-like--active:hover {
+  background: var(--green-dark) !important;
+  border-color: var(--green-dark) !important;
+}
+.btn-like:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .ap-banner {
+    padding: 48px 24px;
+  }
+  .ap-content {
+    padding: 32px 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .banner h1 {
     font-size: 2.25rem;

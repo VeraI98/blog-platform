@@ -48,7 +48,6 @@ export default function SettingsPage() {
     } catch (errs) {
       if (errs && typeof errs === 'object') {
         setServerErrors(errs)
-        // Highlight individual fields that have server errors
         Object.entries(errs).forEach(([field, msgs]) => {
           if (['username', 'email', 'password', 'image', 'bio'].includes(field)) {
             setError(field, {
@@ -93,7 +92,7 @@ export default function SettingsPage() {
         {success && <div className="form-success">Profile updated successfully!</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* Avatar URL */}
+          {/* аватарка */}
           <div className="form-group">
             <input
               className={`form-input${errors.image ? ' input-error' : ''}`}
@@ -109,7 +108,7 @@ export default function SettingsPage() {
             {errors.image && <p className="field-error">{errors.image.message}</p>}
           </div>
 
-          {/* Username */}
+          {/* имя */}
           <div className="form-group">
             <input
               className={`form-input${errors.username ? ' input-error' : ''}`}
@@ -122,7 +121,7 @@ export default function SettingsPage() {
             {errors.username && <p className="field-error">{errors.username.message}</p>}
           </div>
 
-          {/* Bio */}
+          {/* био */}
           <div className="form-group">
             <textarea
               className="form-input form-textarea"
@@ -132,7 +131,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* Email */}
+          {/* еmail */}
           <div className="form-group">
             <input
               className={`form-input${errors.email ? ' input-error' : ''}`}
@@ -149,7 +148,7 @@ export default function SettingsPage() {
             {errors.email && <p className="field-error">{errors.email.message}</p>}
           </div>
 
-          {/* New password (optional) */}
+          {/* новый пароль*/}
           <div className="form-group">
             <input
               className={`form-input${errors.password ? ' input-error' : ''}`}
