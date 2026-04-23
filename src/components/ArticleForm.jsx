@@ -10,6 +10,8 @@ export default function ArticleForm({ article }) {
   const [serverErrors, setServerErrors] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [tagInput, setTagInput] = useState('')
+  const [tags, setTags] = useState([])
+  const [tagValue, setTagValue] = useState('')
 
   const isEdit = Boolean(article)
 
@@ -27,25 +29,34 @@ export default function ArticleForm({ article }) {
         description: article.description || '',
         body: article.body || '',
       })
-      setTagInput((article.tagList || []).join(', '))
+      setTags(article.tagList || [])
     }
   }, [article, reset])
+
+  function handleAddTag(e) {
+    if (e.key === 'Enter' && tagValue.trim()) {
+      e.preventDefault()
+      const newTag = tagValue.trim()
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag])
+      }
+      setTagValue('')
+    }
+  }
+
+  function handleRemoveTag(tag) {
+    setTags(tags.filter((t) => t !== tag))
+  }
 
   async function onSubmit(values) {
     setServerErrors(null)
     setSubmitting(true)
-
-    const tagList = tagInput
-      .split(',')
-      .map((t) => t.trim())
-      .filter(Boolean)
-
     try {
       let result
       if (isEdit) {
-        result = await updateArticle(user.token, article.slug, { ...values, tagList })
+        result = await updateArticle(user.token, article.slug, { ...values, tagList: tags })
       } else {
-        result = await createArticle(user.token, { ...values, tagList })
+        result = await createArticle(user.token, { ...values, tagList: tags })
       }
       navigate(`/articles/${result.slug}`)
     } catch (errs) {
@@ -60,10 +71,8 @@ export default function ArticleForm({ article }) {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card auth-card-wide">
-        <h1 className="auth-title">{isEdit ? 'Edit Article' : 'New Article'}</h1>
-
+    <div className="write-page">
+      <div className="write-card">
         {serverErrors && (
           <ul className="server-errors">
             {Object.entries(serverErrors).map(([field, msgs]) =>
@@ -78,63 +87,65 @@ export default function ArticleForm({ article }) {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="form-group">
+          <div className="write-field">
             <input
-              className={`form-input${errors.title ? ' input-error' : ''}`}
+              className={`write-input${errors.title ? ' write-input--error' : ''}`}
               type="text"
               placeholder="Title"
               {...register('title', { required: 'Title is required' })}
             />
-            {errors.title && <p className="field-error">{errors.title.message}</p>}
+            {errors.title && <p className="write-error">{errors.title.message}</p>}
           </div>
 
-          <div className="form-group">
+          <div className="write-field">
             <input
-              className={`form-input${errors.description ? ' input-error' : ''}`}
+              className={`write-input${errors.description ? ' write-input--error' : ''}`}
               type="text"
               placeholder="Short description"
               {...register('description', { required: 'Description is required' })}
             />
-            {errors.description && <p className="field-error">{errors.description.message}</p>}
+            {errors.description && <p className="write-error">{errors.description.message}</p>}
           </div>
 
-          <div className="form-group">
+          {/* Body */}
+          <div className="write-field">
             <textarea
-              className={`form-input form-textarea form-textarea-tall${errors.body ? ' input-error' : ''}`}
-              placeholder="Write your article (in markdown)"
-              rows={10}
+              className={`write-input write-textarea${errors.body ? ' write-input--error' : ''}`}
+              placeholder="Input your text"
+              rows={12}
               {...register('body', { required: 'Article text is required' })}
             />
-            {errors.body && <p className="field-error">{errors.body.message}</p>}
+            {errors.body && <p className="write-error">{errors.body.message}</p>}
           </div>
 
-          <div className="form-group">
+          {/* теги */}
+          <div className="write-field">
             <input
-              className="form-input"
+              className="write-input write-input--tags"
               type="text"
-              placeholder="Tags (comma separated: react, javascript)"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="Add tag and press Enter"
+              value={tagValue}
+              onChange={(e) => setTagValue(e.target.value)}
+              onKeyDown={handleAddTag}
             />
-
-            {/* тэги */}
-            {tagInput && (
-              <div className="tags-preview">
-                {tagInput
-                  .split(',')
-                  .map((t) => t.trim())
-                  .filter(Boolean)
-                  .map((tag) => (
-                    <span key={tag} className="tag-pill">
-                      {tag}
-                    </span>
-                  ))}
+            {tags.length > 0 && (
+              <div className="write-tags">
+                {tags.map((tag) => (
+                  <span key={tag} className="write-tag">
+                    {tag}
+                    <button
+                      type="button"
+                      className="write-tag-remove"
+                      onClick={() => handleRemoveTag(tag)}
+                    ></button>
+                  </span>
+                ))}
               </div>
             )}
           </div>
 
-          <div className="form-actions">
-            <button className="btn-submit btn-submit-right" type="submit" disabled={submitting}>
+          <div className="write-actions">
+            <button className="write-btn-publish" type="submit" disabled={submitting}>
               {submitting
                 ? isEdit
                   ? 'Saving...'

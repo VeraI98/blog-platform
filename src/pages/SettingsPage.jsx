@@ -25,10 +25,10 @@ export default function SettingsPage() {
       return
     }
     reset({
-      image: user.image || '',
       username: user.username || '',
-      bio: user.bio || '',
       email: user.email || '',
+      bio: user.bio || '',
+      image: user.image || '',
       password: '',
     })
   }, [user, reset, navigate])
@@ -50,10 +50,7 @@ export default function SettingsPage() {
         setServerErrors(errs)
         Object.entries(errs).forEach(([field, msgs]) => {
           if (['username', 'email', 'password', 'image', 'bio'].includes(field)) {
-            setError(field, {
-              type: 'server',
-              message: [].concat(msgs)[0],
-            })
+            setError(field, { type: 'server', message: [].concat(msgs)[0] })
           }
         })
       } else {
@@ -72,9 +69,9 @@ export default function SettingsPage() {
   if (!user) return null
 
   return (
-    <div className="auth-page">
-      <div className="auth-card auth-card-wide">
-        <h1 className="auth-title">Your Settings</h1>
+    <div className="settings-page">
+      <div className="settings-card">
+        <h1 className="settings-title">Your Settings</h1>
 
         {serverErrors && (
           <ul className="server-errors">
@@ -92,91 +89,82 @@ export default function SettingsPage() {
         {success && <div className="form-success">Profile updated successfully!</div>}
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* аватарка */}
-          <div className="form-group">
+          {/* Username */}
+          <div className="settings-field">
             <input
-              className={`form-input${errors.image ? ' input-error' : ''}`}
-              type="text"
-              placeholder="URL of profile picture"
-              {...register('image', {
-                pattern: {
-                  value: /^(https?:\/\/).+/,
-                  message: 'Avatar image must be a valid URL (http:// or https://)',
-                },
-              })}
-            />
-            {errors.image && <p className="field-error">{errors.image.message}</p>}
-          </div>
-
-          {/* имя */}
-          <div className="form-group">
-            <input
-              className={`form-input${errors.username ? ' input-error' : ''}`}
+              className={`settings-input${errors.username ? ' settings-input--error' : ''}`}
               type="text"
               placeholder="Username"
-              {...register('username', {
-                required: 'Username must not be empty',
+              {...register('username', { required: 'Username must not be empty' })}
+            />
+            {errors.username && <p className="settings-error">{errors.username.message}</p>}
+          </div>
+
+          {/* еmail */}
+          <div className="settings-field">
+            <input
+              className={`settings-input${errors.email ? ' settings-input--error' : ''}`}
+              type="email"
+              placeholder="Email Address"
+              {...register('email', {
+                required: 'Email must not be empty',
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Email must be valid' },
               })}
             />
-            {errors.username && <p className="field-error">{errors.username.message}</p>}
+            {errors.email && <p className="settings-error">{errors.email.message}</p>}
           </div>
 
           {/* био */}
-          <div className="form-group">
+          <div className="settings-field">
             <textarea
-              className="form-input form-textarea"
-              placeholder="Short bio about you"
+              className="settings-input settings-textarea"
+              placeholder="Input your bio"
               rows={5}
               {...register('bio')}
             />
           </div>
 
-          {/* еmail */}
-          <div className="form-group">
+          {/* ссылка */}
+          <div className="settings-field">
             <input
-              className={`form-input${errors.email ? ' input-error' : ''}`}
-              type="email"
-              placeholder="Email address"
-              {...register('email', {
-                required: 'Email must not be empty',
+              className={`settings-input${errors.image ? ' settings-input--error' : ''}`}
+              type="text"
+              placeholder="Avatar image (URL)"
+              {...register('image', {
                 pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Email must be valid',
+                  value: /^(https?:\/\/).+/,
+                  message: 'Avatar image must be a valid URL',
                 },
               })}
             />
-            {errors.email && <p className="field-error">{errors.email.message}</p>}
+            {errors.image && <p className="settings-error">{errors.image.message}</p>}
           </div>
 
-          {/* новый пароль*/}
-          <div className="form-group">
+          {/* рassword */}
+          <div className="settings-field">
             <input
-              className={`form-input${errors.password ? ' input-error' : ''}`}
+              className={`settings-input${errors.password ? ' settings-input--error' : ''}`}
               type="password"
-              placeholder="New password (leave blank to keep current)"
+              placeholder="New password"
               autoComplete="new-password"
               {...register('password', {
-                minLength: {
-                  value: 6,
-                  message: 'New password must be at least 6 characters',
-                },
-                maxLength: {
-                  value: 40,
-                  message: 'New password must be at most 40 characters',
-                },
+                minLength: { value: 6, message: 'Password must be at least 6 characters' },
+                maxLength: { value: 40, message: 'Password must be at most 40 characters' },
               })}
             />
-            {errors.password && <p className="field-error">{errors.password.message}</p>}
+            {errors.password && <p className="settings-error">{errors.password.message}</p>}
           </div>
 
-          <button className="btn-submit" type="submit" disabled={submitting}>
-            {submitting ? 'Saving...' : 'Update Settings'}
-          </button>
+          <div className="settings-actions">
+            <button className="settings-btn-submit" type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Update Settings'}
+            </button>
+          </div>
         </form>
 
         <hr className="settings-divider" />
 
-        <button className="btn-logout-block" onClick={handleLogout}>
+        <button className="settings-btn-logout" onClick={handleLogout}>
           Or click here to logout.
         </button>
       </div>
