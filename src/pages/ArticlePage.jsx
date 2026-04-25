@@ -35,22 +35,26 @@ export default function ArticlePage() {
 
   const { data: article, loading, error, refetch } = useFetch(() => fetchArticle(slug), [slug])
 
-  // Локальное состояние для лайков (оптимистичное обновление)
   const [localFavorited, setLocalFavorited] = useState(null)
   const [localCount, setLocalCount] = useState(null)
-
   const favorited = localFavorited !== null ? localFavorited : article?.favorited
   const favCount = localCount !== null ? localCount : article?.favoritesCount
+
+  // клик на имя
+  function handleAuthorClick(username) {
+    if (!user) {
+      navigate('/sign-up')
+    } else {
+      navigate(`/profile/${encodeURIComponent(username)}`)
+    }
+  }
 
   async function handleFavorite() {
     if (!user || favoriting) return
     setFavoriting(true)
-
-    // Оптимистичное обновление
     const newFavorited = !favorited
     setLocalFavorited(newFavorited)
     setLocalCount((favCount || 0) + (newFavorited ? 1 : -1))
-
     try {
       const updated = newFavorited
         ? await favoriteArticle(user.token, slug)
@@ -58,7 +62,6 @@ export default function ArticlePage() {
       setLocalFavorited(updated.favorited)
       setLocalCount(updated.favoritesCount)
     } catch {
-      // Откат при ошибке
       setLocalFavorited(!newFavorited)
       setLocalCount(favCount || 0)
     } finally {
@@ -93,30 +96,31 @@ export default function ArticlePage() {
     <div className="ap-wrapper">
       <div className="ap-spacer" />
       <div className="ap-banner">
-        <div className="ap-banner-inner">
-          <h1 className="ap-title">{title}</h1>
-          <div className="ap-banner-author">
-            <img
-              className="ap-avatar"
-              src={
-                author.image ||
-                `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=888888&fontColor=ffffff`
-              }
-              alt={author.username}
-              onError={(e) => {
-                e.target.onerror = null
-                e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
-              }}
-            />
-            <div>
-              <Link
-                to={`/profile/${encodeURIComponent(author.username)}`}
-                className="ap-author-name"
-              >
-                {author.username}
-              </Link>
-              <span className="ap-date">{formatDate(createdAt)}</span>
-            </div>
+        <h1 className="ap-title">{title}</h1>
+        <div className="ap-banner-author">
+          <img
+            className="ap-avatar"
+            src={
+              author.image ||
+              `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=888888&fontColor=ffffff`
+            }
+            alt={author.username}
+            onClick={() => handleAuthorClick(author.username)}
+            style={{ cursor: 'pointer' }}
+            onError={(e) => {
+              e.target.onerror = null
+              e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
+            }}
+          />
+          <div>
+            <span
+              className="ap-author-name"
+              onClick={() => handleAuthorClick(author.username)}
+              style={{ cursor: 'pointer' }}
+            >
+              {author.username}
+            </span>
+            <span className="ap-date">{formatDate(createdAt)}</span>
           </div>
         </div>
       </div>
@@ -144,18 +148,21 @@ export default function ArticlePage() {
                 author.image || `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
               }
               alt={author.username}
+              onClick={() => handleAuthorClick(author.username)}
+              style={{ cursor: 'pointer' }}
               onError={(e) => {
                 e.target.onerror = null
                 e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
               }}
             />
             <div className="ap-footer-author-info">
-              <Link
-                to={`/profile/${encodeURIComponent(author.username)}`}
+              <span
                 className="ap-footer-author-name"
+                onClick={() => handleAuthorClick(author.username)}
+                style={{ cursor: 'pointer' }}
               >
                 {author.username}
-              </Link>
+              </span>
               <span className="ap-footer-date">{formatDate(createdAt)}</span>
             </div>
           </div>
@@ -179,7 +186,8 @@ export default function ArticlePage() {
                 className={`ap-btn-favorite${favorited ? ' ap-btn-favorite--active' : ''}`}
                 onClick={handleFavorite}
                 disabled={!user || favoriting}
-                title={!user ? 'Sign in to favorite articles' : ''}
+                style={{ cursor: !user ? 'not-allowed' : favoriting ? 'wait' : 'pointer' }}
+                title={!user ? 'Sign in to favorite' : ''}
               >
                 <HeartIcon />
                 {favorited ? 'Unfavorite' : 'Favorite article'} ({favCount})

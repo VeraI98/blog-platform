@@ -26,20 +26,26 @@ export default function ArticlePreview({ article }) {
 
   const [favorited, setFavorited] = useState(article.favorited)
   const [favCount, setFavCount] = useState(article.favoritesCount)
-  const [loading, setLoading] = useState(false)
+  const [likeLoading, setLikeLoading] = useState(false)
+
+  function handleAuthorClick(e) {
+    e.preventDefault()
+    if (!user) {
+      navigate('/sign-up')
+    } else {
+      navigate(`/profile/${encodeURIComponent(author.username)}`)
+    }
+  }
 
   async function handleFavorite(e) {
-    e.preventDefault() // не переходить по ссылке
-
+    e.preventDefault()
     if (!user) {
       navigate('/sign-in')
       return
     }
+    if (likeLoading) return
+    setLikeLoading(true)
 
-    if (loading) return
-    setLoading(true)
-
-    // обновление
     const newFavorited = !favorited
     setFavorited(newFavorited)
     setFavCount((c) => c + (newFavorited ? 1 : -1))
@@ -51,11 +57,10 @@ export default function ArticlePreview({ article }) {
       setFavorited(updated.favorited)
       setFavCount(updated.favoritesCount)
     } catch {
-      // откат при ошибке
       setFavorited(!newFavorited)
       setFavCount((c) => c + (newFavorited ? -1 : 1))
     } finally {
-      setLoading(false)
+      setLikeLoading(false)
     }
   }
 
@@ -70,25 +75,26 @@ export default function ArticlePreview({ article }) {
               `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=5cb85c&fontColor=ffffff`
             }
             alt={author.username}
+            onClick={handleAuthorClick}
+            style={{ cursor: 'pointer' }}
             onError={(e) => {
               e.target.onerror = null
               e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=5cb85c&fontColor=ffffff`
             }}
           />
           <div className="author-details">
-            <Link to={`/profile/${encodeURIComponent(author.username)}`} className="author-name">
+            <span className="author-name" onClick={handleAuthorClick} style={{ cursor: 'pointer' }}>
               {author.username}
-            </Link>
+            </span>
             <span className="article-date">{formatDate(createdAt)}</span>
           </div>
         </div>
 
-        {/* Кнопка лайка */}
         <button
           className={`btn-like${favorited ? ' btn-like--active' : ''}`}
           onClick={handleFavorite}
-          disabled={loading}
-          title={!user ? 'Sign in to like articles' : favorited ? 'Unlike' : 'Like'}
+          style={{ cursor: likeLoading ? 'wait' : 'pointer' }}
+          title={!user ? 'Sign in to like' : favorited ? 'Unlike' : 'Like'}
         >
           <HeartIcon />
           {favCount}

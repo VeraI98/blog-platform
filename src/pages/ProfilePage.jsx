@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useFetch } from '../hooks/useFetch'
-import { fetchProfile, fetchUserArticles } from '../utils/api'
+import { fetchProfile } from '../utils/api'
 import { useAuth } from '../context/AuthContext'
 import ArticlePreview from '../components/ArticlePreview'
 import Pagination from '../components/Pagination'
@@ -39,14 +39,20 @@ export default function ProfilePage() {
   } = useFetch(() => {
     const offset = (page - 1) * LIMIT
     const params = new URLSearchParams({ limit: LIMIT, offset })
+
     if (activeTab === 'my') {
       params.set('author', decodedUsername)
     } else {
       params.set('favorited', decodedUsername)
     }
-    return fetch(`${BASE_URL}/articles?${params}`, {
-      headers: token ? { Authorization: `Token ${token}` } : {},
-    }).then((r) => r.json())
+
+    const headers = {}
+    if (token) headers['Authorization'] = `Token ${token}`
+
+    return fetch(`${BASE_URL}/articles?${params}`, { headers }).then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      return r.json()
+    })
   }, [decodedUsername, page, activeTab])
 
   const totalPages = articlesData ? Math.ceil(articlesData.articlesCount / LIMIT) : 0
@@ -83,7 +89,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      {/* Тёмный баннер */}
       <div className="profile-banner">
         <img
           className="profile-avatar"
@@ -97,15 +102,12 @@ export default function ProfilePage() {
             e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${decodedUsername}`
           }}
         />
-
         <h2 className="profile-username">{decodedUsername}</h2>
-
         {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
 
-        {/* своя страница и чужая */}
         {isOwn ? (
           <Link to="/settings" className="btn-edit-profile">
-            Edit Profile Settings
+            ⚙ Edit Profile Settings
           </Link>
         ) : user ? (
           <button
@@ -118,7 +120,6 @@ export default function ProfilePage() {
         ) : null}
       </div>
 
-      {/* лента  */}
       <div className="page-content">
         <div className="feed-col">
           <div className="feed-toggle">
@@ -143,7 +144,9 @@ export default function ProfilePage() {
             <>
               {articlesData.articles.length === 0 ? (
                 <div className="loading-state">
-                  <p>No articles yet.</p>
+                  <p>
+                    {activeTab === 'favorited' ? 'No favorited articles yet.' : 'No articles yet.'}
+                  </p>
                 </div>
               ) : (
                 articlesData.articles.map((article) => (

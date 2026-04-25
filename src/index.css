@@ -1488,6 +1488,39 @@ a {
   text-decoration: underline;
 }
 
+/* баги */
+.btn-like {
+  cursor: pointer !important;
+}
+
+.btn-like:disabled {
+  cursor: wait !important;
+  opacity: 1 !important;
+}
+
+.btn-like--active {
+  background: var(--green) !important;
+  color: #fff !important;
+  border-color: var(--green) !important;
+}
+.btn-like--active:hover {
+  background: var(--green-dark) !important;
+  border-color: var(--green-dark) !important;
+}
+
+.author-name--guest {
+  cursor: default !important;
+  color: var(--green);
+}
+.author-name--guest:hover {
+  text-decoration: none !important;
+  color: var(--green) !important;
+}
+
+.ap-author-name.author-name--guest {
+  color: var(--green) !important;
+}
+
 @media (max-width: 900px) {
   .ap-banner {
     padding: 48px 24px;
