@@ -1,3 +1,3 @@
 # Realworld Blog
 
-[Open website](blog-platform-navy-ten.vercel.app)
+[Open website](https://blog-platform-navy-ten.vercel.app/)
