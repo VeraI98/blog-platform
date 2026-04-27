@@ -96,22 +96,24 @@ export default function ArticlePage() {
     <div className="ap-wrapper">
       <div className="ap-spacer" />
       <div className="ap-banner">
-        <h1 className="ap-title">{title}</h1>
-        <div className="ap-banner-author">
-          <img
-            className="ap-avatar"
-            src={
-              author.image ||
-              `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=888888&fontColor=ffffff`
-            }
-            alt={author.username}
-            onClick={() => handleAuthorClick(author.username)}
-            style={{ cursor: 'pointer' }}
-            onError={(e) => {
-              e.target.onerror = null
-              e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
-            }}
-          />
+        <div className="ap-banner-inner">
+          <h1 className="ap-title">{title}</h1>
+          <div className="ap-banner-author">
+            <img
+              className="ap-avatar"
+              src={
+                author.image ||
+                `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}&backgroundColor=888888&fontColor=ffffff`
+              }
+              alt={author.username}
+              onClick={() => handleAuthorClick(author.username)}
+              style={{ cursor: 'pointer' }}
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${author.username}`
+              }}
+            />
+          </div>
           <div>
             <span
               className="ap-author-name"
