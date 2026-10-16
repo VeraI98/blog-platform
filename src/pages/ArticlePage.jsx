@@ -28,12 +28,24 @@ function HeartIcon() {
 export default function ArticlePage() {
   const { slug } = useParams()
   const { user } = useAuth()
+  return <ArticleDetail key={`${slug}:${user?.token || 'guest'}`} />
+}
+
+function ArticleDetail() {
+  const { slug } = useParams()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [actionError, setActionError] = useState(null)
   const [favoriting, setFavoriting] = useState(false)
 
-  const { data: article, loading, error, refetch } = useFetch(() => fetchArticle(slug), [slug])
+  const {
+    data: article,
+    loading,
+    error,
+    refetch,
+  } = useFetch(() => fetchArticle(slug, user?.token), [slug, user?.token])
 
   const [localFavorited, setLocalFavorited] = useState(null)
   const [localCount, setLocalCount] = useState(null)
@@ -51,6 +63,7 @@ export default function ArticlePage() {
 
   async function handleFavorite() {
     if (!user || favoriting) return
+    setActionError(null)
     setFavoriting(true)
     const newFavorited = !favorited
     setLocalFavorited(newFavorited)
@@ -62,6 +75,7 @@ export default function ArticlePage() {
       setLocalFavorited(updated.favorited)
       setLocalCount(updated.favoritesCount)
     } catch {
+      setActionError('Could not update favorite. Please try again.')
       setLocalFavorited(!newFavorited)
       setLocalCount(favCount || 0)
     } finally {
@@ -70,11 +84,14 @@ export default function ArticlePage() {
   }
 
   async function handleDelete() {
+    if (deleting) return
+    setActionError(null)
     setDeleting(true)
     try {
       await deleteArticle(user.token, slug)
       navigate('/')
     } catch {
+      setActionError('Could not delete the article. Please try again.')
       setDeleting(false)
       setShowDeleteModal(false)
     }
@@ -128,6 +145,11 @@ export default function ArticlePage() {
       </div>
 
       <div className="ap-content">
+        {actionError && (
+          <p role="alert" className="action-error">
+            {actionError}
+          </p>
+        )}
         <div className="ap-body">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
         </div>
@@ -200,7 +222,11 @@ export default function ArticlePage() {
       </div>
 
       {showDeleteModal && (
-        <DeleteModal onConfirm={handleDelete} onCancel={() => setShowDeleteModal(false)} />
+        <DeleteModal
+          pending={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteModal(false)}
+        />
       )}
     </div>
   )

@@ -16,17 +16,29 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(loadUser)
 
   const login = useCallback((userData) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
+    } catch {
+      /* Keep authentication in memory if storage is blocked. */
+    }
     setUser(userData)
   }, [])
 
   const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY)
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      /* Keep authentication in memory if storage is blocked. */
+    }
     setUser(null)
   }, [])
 
   const updateUser = useCallback((userData) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData))
+    } catch {
+      /* Keep authentication in memory if storage is blocked. */
+    }
     setUser(userData)
   }, [])
 

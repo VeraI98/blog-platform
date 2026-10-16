@@ -14,12 +14,19 @@ const BASE_URL = 'https://realworld.habsida.net/api'
 export default function ProfilePage() {
   const { username } = useParams()
   const { user } = useAuth()
+  return <ProfileDetail key={`${username}:${user?.token || 'guest'}`} />
+}
+
+function ProfileDetail() {
+  const { username } = useParams()
+  const { user } = useAuth()
   const [page, setPage] = useState(1)
   const [activeTab, setActiveTab] = useState('my')
   const [followState, setFollowState] = useState(null)
+  const [followError, setFollowError] = useState(null)
   const [followLoading, setFollowLoading] = useState(false)
 
-  const decodedUsername = decodeURIComponent(username)
+  const decodedUsername = username
   const token = user?.token || null
   const isOwn = user?.username === decodedUsername
 
@@ -27,7 +34,7 @@ export default function ProfilePage() {
     data: profile,
     loading: profileLoading,
     error: profileError,
-  } = useFetch(() => fetchProfile(decodedUsername, token), [decodedUsername])
+  } = useFetch(() => fetchProfile(decodedUsername, token), [decodedUsername, token])
 
   const isFollowing = followState !== null ? followState : profile?.following
 
@@ -53,21 +60,29 @@ export default function ProfilePage() {
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       return r.json()
     })
-  }, [decodedUsername, page, activeTab])
+  }, [decodedUsername, page, activeTab, token])
 
   const totalPages = articlesData ? Math.ceil(articlesData.articlesCount / LIMIT) : 0
 
   async function handleFollow() {
     if (!user || followLoading) return
+    setFollowError(null)
     setFollowLoading(true)
     const newFollowing = !isFollowing
     setFollowState(newFollowing)
     try {
-      await fetch(`${BASE_URL}/profiles/${decodedUsername}/follow`, {
-        method: newFollowing ? 'POST' : 'DELETE',
-        headers: { Authorization: `Token ${token}` },
-      })
+      const response = await fetch(
+        `${BASE_URL}/profiles/${encodeURIComponent(decodedUsername)}/follow`,
+        {
+          method: newFollowing ? 'POST' : 'DELETE',
+          headers: { Authorization: `Token ${token}` },
+        }
+      )
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      setFollowState(result.profile.following)
     } catch {
+      setFollowError('Could not update follow status. Please try again.')
       setFollowState(!newFollowing)
     } finally {
       setFollowLoading(false)
@@ -102,6 +117,11 @@ export default function ProfilePage() {
             e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${decodedUsername}`
           }}
         />
+        {followError && (
+          <p role="alert" className="action-error">
+            {followError}
+          </p>
+        )}
         <h2 className="profile-username">{decodedUsername}</h2>
         {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
 

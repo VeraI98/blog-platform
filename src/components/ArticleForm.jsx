@@ -1,3 +1,4 @@
+import { formErrors } from '../utils/errors'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -9,7 +10,6 @@ export default function ArticleForm({ article }) {
   const navigate = useNavigate()
   const [serverErrors, setServerErrors] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState([])
   const [tagValue, setTagValue] = useState('')
 
@@ -34,8 +34,9 @@ export default function ArticleForm({ article }) {
   }, [article, reset])
 
   function handleAddTag(e) {
-    if (e.key === 'Enter' && tagValue.trim()) {
+    if (e.key === 'Enter') {
       e.preventDefault()
+      if (!tagValue.trim()) return
       const newTag = tagValue.trim()
       if (!tags.includes(newTag)) {
         setTags([...tags, newTag])
@@ -59,7 +60,8 @@ export default function ArticleForm({ article }) {
         result = await createArticle(user.token, { ...values, tagList: tags })
       }
       navigate(`/articles/${result.slug}`)
-    } catch (errs) {
+    } catch (error) {
+      const errs = formErrors(error)
       if (errs && typeof errs === 'object') {
         setServerErrors(errs)
       } else {
@@ -91,8 +93,12 @@ export default function ArticleForm({ article }) {
             <input
               className={`write-input${errors.title ? ' write-input--error' : ''}`}
               type="text"
+              aria-label="Title"
               placeholder="Title"
-              {...register('title', { required: 'Title is required' })}
+              {...register('title', {
+                required: 'Title is required',
+                validate: (value) => Boolean(value.trim()) || 'Please enter text',
+              })}
             />
             {errors.title && <p className="write-error">{errors.title.message}</p>}
           </div>
@@ -101,8 +107,12 @@ export default function ArticleForm({ article }) {
             <input
               className={`write-input${errors.description ? ' write-input--error' : ''}`}
               type="text"
+              aria-label="Short description"
               placeholder="Short description"
-              {...register('description', { required: 'Description is required' })}
+              {...register('description', {
+                required: 'Description is required',
+                validate: (value) => Boolean(value.trim()) || 'Please enter text',
+              })}
             />
             {errors.description && <p className="write-error">{errors.description.message}</p>}
           </div>
@@ -111,9 +121,13 @@ export default function ArticleForm({ article }) {
           <div className="write-field">
             <textarea
               className={`write-input write-textarea${errors.body ? ' write-input--error' : ''}`}
+              aria-label="Input your text"
               placeholder="Input your text"
               rows={12}
-              {...register('body', { required: 'Article text is required' })}
+              {...register('body', {
+                required: 'Article text is required',
+                validate: (value) => Boolean(value.trim()) || 'Please enter text',
+              })}
             />
             {errors.body && <p className="write-error">{errors.body.message}</p>}
           </div>
@@ -123,6 +137,7 @@ export default function ArticleForm({ article }) {
             <input
               className="write-input write-input--tags"
               type="text"
+              aria-label="Add tag and press Enter"
               placeholder="Add tag and press Enter"
               value={tagValue}
               onChange={(e) => setTagValue(e.target.value)}
@@ -136,6 +151,7 @@ export default function ArticleForm({ article }) {
                     <button
                       type="button"
                       className="write-tag-remove"
+                      aria-label={`Remove tag ${tag}`}
                       onClick={() => handleRemoveTag(tag)}
                     ></button>
                   </span>

@@ -1,21 +1,13 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 
 export function useFetch(fetcher, deps = []) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const mountedRef = useRef(true)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => {
-      mountedRef.current = false
-    }
-  }, [])
+  const [revision, setRevision] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-
     async function load() {
       setLoading(true)
       setError(null)
@@ -28,22 +20,13 @@ export function useFetch(fetcher, deps = []) {
         if (!cancelled) setLoading(false)
       }
     }
-
-    load()
-
+    void load()
     return () => {
       cancelled = true
     }
-  }, deps)
+    // Callers supply all request dependencies; retries use the same cleanup path.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...deps, revision])
 
-  function refetch() {
-    setLoading(true)
-    setError(null)
-    fetcher()
-      .then(setData)
-      .catch((err) => setError(err.message || 'Something went wrong'))
-      .finally(() => setLoading(false))
-  }
-
-  return { data, loading, error, refetch }
+  return { data, loading, error, refetch: () => setRevision((value) => value + 1) }
 }

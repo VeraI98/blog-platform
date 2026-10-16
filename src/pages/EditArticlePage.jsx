@@ -1,3 +1,4 @@
+import { useAuth } from '../context/AuthContext'
 import { useParams } from 'react-router-dom'
 import { useFetch } from '../hooks/useFetch'
 import { fetchArticle } from '../utils/api'
@@ -7,8 +8,13 @@ import ErrorMessage from '../components/ErrorMessage'
 
 export default function EditArticlePage() {
   const { slug } = useParams()
+  const { user } = useAuth()
 
-  const { data: article, loading, error } = useFetch(() => fetchArticle(slug), [slug])
+  const {
+    data: article,
+    loading,
+    error,
+  } = useFetch(() => fetchArticle(slug, user?.token), [slug, user?.token])
 
   if (loading) return <Loading text="Loading article..." />
   if (error)
@@ -18,5 +24,8 @@ export default function EditArticlePage() {
       </div>
     )
 
-  return <ArticleForm article={article} />
+  if (article?.author.username !== user?.username) {
+    return <ErrorMessage message="You can only edit your own articles." />
+  }
+  return <ArticleForm key={article.slug} article={article} />
 }

@@ -1,3 +1,4 @@
+import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
 import { useFetch } from '../hooks/useFetch'
 import { fetchArticles } from '../utils/api'
@@ -10,12 +11,13 @@ import ErrorMessage from '../components/ErrorMessage'
 const LIMIT = 10
 
 export default function ArticleListPage() {
+  const { user } = useAuth()
   const [page, setPage] = useState(1)
   const [selectedTag, setSelectedTag] = useState('')
 
   const { data, loading, error, refetch } = useFetch(
-    () => fetchArticles({ page, limit: LIMIT, tag: selectedTag }),
-    [page, selectedTag]
+    () => fetchArticles({ page, limit: LIMIT, tag: selectedTag, token: user?.token }),
+    [page, selectedTag, user?.token]
   )
 
   const totalPages = data ? Math.ceil(data.articlesCount / LIMIT) : 0
@@ -65,7 +67,10 @@ export default function ArticleListPage() {
                 </div>
               ) : (
                 data.articles.map((article) => (
-                  <ArticlePreview key={article.slug} article={article} />
+                  <ArticlePreview
+                    key={`${article.slug}:${user?.token || 'guest'}:${article.favorited}`}
+                    article={article}
+                  />
                 ))
               )}
 

@@ -27,7 +27,8 @@
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.jsx",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "node --test tests/*.test.mjs"
   },
   "lint-staged": {
     "src/**/*.{js,jsx}": [
