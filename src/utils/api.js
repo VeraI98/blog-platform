@@ -7,17 +7,17 @@ function authHeaders(token) {
   }
 }
 
-export async function fetchArticles({ page = 1, limit = 10, tag = '' } = {}) {
+export async function fetchArticles({ page = 1, limit = 10, tag = '', token } = {}) {
   const offset = (page - 1) * limit
   const params = new URLSearchParams({ limit, offset })
   if (tag) params.set('tag', tag)
-  const res = await fetch(`${BASE_URL}/articles?${params}`)
+  const res = await fetch(`${BASE_URL}/articles?${params}`, { headers: authHeaders(token) })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return res.json()
 }
 
-export async function fetchArticle(slug) {
-  const res = await fetch(`${BASE_URL}/articles/${slug}`)
+export async function fetchArticle(slug, token) {
+  const res = await fetch(`${BASE_URL}/articles/${slug}`, { headers: authHeaders(token) })
   if (res.status === 404) throw new Error('Article not found')
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const data = await res.json()
@@ -31,10 +31,10 @@ export async function fetchTags() {
   return data.tags
 }
 
-export async function fetchUserArticles({ username, page = 1, limit = 5 }) {
+export async function fetchUserArticles({ username, page = 1, limit = 5, token }) {
   const offset = (page - 1) * limit
   const params = new URLSearchParams({ limit, offset, author: username })
-  const res = await fetch(`${BASE_URL}/articles?${params}`)
+  const res = await fetch(`${BASE_URL}/articles?${params}`, { headers: authHeaders(token) })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return res.json()
 }
@@ -46,7 +46,7 @@ export async function loginUser({ email, password }) {
     body: JSON.stringify({ user: { email, password } }),
   })
   const data = await res.json()
-  if (!res.ok) throw data.errors
+  if (!res.ok) throw data.errors || new Error(`Request failed: HTTP ${res.status}`)
   return data.user
 }
 
@@ -57,7 +57,7 @@ export async function registerUser({ username, email, password }) {
     body: JSON.stringify({ user: { username, email, password } }),
   })
   const data = await res.json()
-  if (!res.ok) throw data.errors
+  if (!res.ok) throw data.errors || new Error(`Request failed: HTTP ${res.status}`)
   return data.user
 }
 
@@ -68,13 +68,13 @@ export async function updateUserApi(token, fields) {
     body: JSON.stringify({ user: fields }),
   })
   const data = await res.json()
-  if (!res.ok) throw data.errors
+  if (!res.ok) throw data.errors || new Error(`Request failed: HTTP ${res.status}`)
   return data.user
 }
 
 export async function fetchProfile(username, token) {
-  const decodedName = decodeURIComponent(username)
-  const res = await fetch(`${BASE_URL}/profiles/${decodedName}`, {
+  const encodedName = encodeURIComponent(username)
+  const res = await fetch(`${BASE_URL}/profiles/${encodedName}`, {
     headers: token ? { Authorization: `Token ${token}` } : {},
   })
 
@@ -91,7 +91,7 @@ export async function createArticle(token, { title, description, body, tagList }
     body: JSON.stringify({ article: { title, description, body, tagList } }),
   })
   const data = await res.json()
-  if (!res.ok) throw data.errors
+  if (!res.ok) throw data.errors || new Error(`Request failed: HTTP ${res.status}`)
   return data.article
 }
 
@@ -102,7 +102,7 @@ export async function updateArticle(token, slug, fields) {
     body: JSON.stringify({ article: fields }),
   })
   const data = await res.json()
-  if (!res.ok) throw data.errors
+  if (!res.ok) throw data.errors || new Error(`Request failed: HTTP ${res.status}`)
   return data.article
 }
 

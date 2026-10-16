@@ -26,6 +26,7 @@ export default function ArticlePreview({ article }) {
 
   const [favorited, setFavorited] = useState(article.favorited)
   const [favCount, setFavCount] = useState(article.favoritesCount)
+  const [actionError, setActionError] = useState(null)
   const [likeLoading, setLikeLoading] = useState(false)
 
   function handleAuthorClick(e) {
@@ -44,6 +45,7 @@ export default function ArticlePreview({ article }) {
       return
     }
     if (likeLoading) return
+    setActionError(null)
     setLikeLoading(true)
 
     const newFavorited = !favorited
@@ -57,6 +59,7 @@ export default function ArticlePreview({ article }) {
       setFavorited(updated.favorited)
       setFavCount(updated.favoritesCount)
     } catch {
+      setActionError('Could not update favorite. Please try again.')
       setFavorited(!newFavorited)
       setFavCount((c) => c + (newFavorited ? -1 : 1))
     } finally {
@@ -66,6 +69,11 @@ export default function ArticlePreview({ article }) {
 
   return (
     <div className="article-preview">
+      {actionError && (
+        <p role="alert" className="action-error">
+          {actionError}
+        </p>
+      )}
       <div className="article-meta">
         <div className="author-info">
           <img
@@ -92,6 +100,7 @@ export default function ArticlePreview({ article }) {
 
         <button
           className={`btn-like${favorited ? ' btn-like--active' : ''}`}
+          disabled={likeLoading}
           onClick={handleFavorite}
           style={{ cursor: likeLoading ? 'wait' : 'pointer' }}
           title={!user ? 'Sign in to like' : favorited ? 'Unlike' : 'Like'}

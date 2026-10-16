@@ -1,3 +1,4 @@
+import { formErrors } from '../utils/errors'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -23,7 +24,8 @@ export default function SignInPage() {
       const user = await loginUser(values)
       login(user)
       navigate('/')
-    } catch (errs) {
+    } catch (error) {
+      const errs = formErrors(error)
       if (errs && typeof errs === 'object') {
         setServerErrors(errs)
       } else {
@@ -60,6 +62,7 @@ export default function SignInPage() {
             <input
               className={`form-input${errors.email ? ' input-error' : ''}`}
               type="email"
+              aria-label="Email address"
               placeholder="Email address"
               autoComplete="email"
               {...register('email', {
@@ -77,6 +80,7 @@ export default function SignInPage() {
             <input
               className={`form-input${errors.password ? ' input-error' : ''}`}
               type="password"
+              aria-label="Password"
               placeholder="Password"
               autoComplete="current-password"
               {...register('password', {

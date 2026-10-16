@@ -1,3 +1,4 @@
+import { formErrors } from '../utils/errors'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -45,7 +46,8 @@ export default function SettingsPage() {
       const updated = await updateUserApi(user.token, fields)
       updateUser({ ...updated, token: user.token })
       setSuccess(true)
-    } catch (errs) {
+    } catch (error) {
+      const errs = formErrors(error)
       if (errs && typeof errs === 'object') {
         setServerErrors(errs)
         Object.entries(errs).forEach(([field, msgs]) => {
@@ -94,6 +96,7 @@ export default function SettingsPage() {
             <input
               className={`settings-input${errors.username ? ' settings-input--error' : ''}`}
               type="text"
+              aria-label="Username"
               placeholder="Username"
               {...register('username', { required: 'Username must not be empty' })}
             />
@@ -105,6 +108,7 @@ export default function SettingsPage() {
             <input
               className={`settings-input${errors.email ? ' settings-input--error' : ''}`}
               type="email"
+              aria-label="Email Address"
               placeholder="Email Address"
               {...register('email', {
                 required: 'Email must not be empty',
@@ -118,6 +122,7 @@ export default function SettingsPage() {
           <div className="settings-field">
             <textarea
               className="settings-input settings-textarea"
+              aria-label="Input your bio"
               placeholder="Input your bio"
               rows={5}
               {...register('bio')}
@@ -129,6 +134,7 @@ export default function SettingsPage() {
             <input
               className={`settings-input${errors.image ? ' settings-input--error' : ''}`}
               type="text"
+              aria-label="Avatar image (URL)"
               placeholder="Avatar image (URL)"
               {...register('image', {
                 pattern: {
@@ -145,6 +151,7 @@ export default function SettingsPage() {
             <input
               className={`settings-input${errors.password ? ' settings-input--error' : ''}`}
               type="password"
+              aria-label="New password"
               placeholder="New password"
               autoComplete="new-password"
               {...register('password', {
